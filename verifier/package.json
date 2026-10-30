@@ -1,0 +1,21 @@
+{
+  "name": "flat-ballot-verifier",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Public, deterministic verifier for FlatBallot elections ($WIF on Robinhood Chain)",
+  "scripts": {
+    "test": "vitest run",
+    "verify": "tsx src/cli.ts",
+    "agent": "tsx src/agent.ts"
+  },
+  "dependencies": {
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "viem": "^2.21.55",
+    "vitest": "^2.1.8"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.5"
+  }
+}

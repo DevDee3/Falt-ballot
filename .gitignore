@@ -1,0 +1,9 @@
+node_modules/
+.next/
+out
+cache
+.env.local
+contracts/lib
+*.tsbuildinfo
+dev-runtime*.log
+.git-backup/
