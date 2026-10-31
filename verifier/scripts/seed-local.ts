@@ -1,12 +1,11 @@
 /**
  * Seeds a local anvil chain for UI testing and demos.
  *   anvil --port 8545 &   then   npx tsx scripts/seed-local.ts
- * Writes ../web/.env.local pointing the web app at the deployed contracts.
+ * Prints the deployed addresses; it never changes the web app environment file.
  *
  * Election #1: a complete lifecycle (votes incl. a sybil cluster -> burn -> verified commit -> draw).
  * Election #2: open right now, with a few votes in.
  */
-import { writeFileSync } from "node:fs";
 import { createPublicClient, createTestClient, createWalletClient, http, parseEther, zeroAddress, type Address, type Hex } from "viem";
 import { foundry } from "viem/chains";
 import { mnemonicToAccount } from "viem/accounts";
@@ -110,19 +109,8 @@ async function main() {
   await vote(4, e2.id, 0);
   await vote(5, e2.id, 1);
 
-  const env = [
-    "NEXT_PUBLIC_CHAIN_ID=31337",
-    `NEXT_PUBLIC_RPC_URL=${RPC}`,
-    "NEXT_PUBLIC_CHAIN_NAME=Local anvil",
-    "NEXT_PUBLIC_EXPLORER=http://localhost:4000",
-    `NEXT_PUBLIC_WIF=${wif}`,
-    `NEXT_PUBLIC_BALLOT=${ballot}`,
-    `NEXT_PUBLIC_DEPLOY_BLOCK=${deployBlock}`,
-    `NEXT_PUBLIC_WIF_DEPLOY_BLOCK=${wifBlock}`,
-    "NEXT_PUBLIC_LOG_CHUNK=1000",
-  ].join("\n");
-  writeFileSync(new URL("../../web/.env.local", import.meta.url), env + "\n");
-  console.log("wrote web/.env.local\n" + env);
+  console.log("local seed complete; web/.env.local was not changed");
+  console.log({ chainId: 31337, rpcUrl: RPC, wif, ballot, deployBlock, wifDeployBlock: wifBlock });
 }
 main().catch((e) => {
   console.error(e);
