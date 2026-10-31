@@ -11,6 +11,10 @@ let tokenPromise: Promise<TokenInfo> | null = null;
 export function getToken(): Promise<TokenInfo> {
   if (!tokenPromise) {
     tokenPromise = (async () => {
+      const code = await publicClient.getCode({ address: CONFIG.wif });
+      if (!code || code === "0x") {
+        throw new Error(`The configured $WIF token is not deployed on ${CONFIG.chainName}. Check NEXT_PUBLIC_WIF and NEXT_PUBLIC_RPC_URL.`);
+      }
       const [decimals, symbol] = await Promise.all([
         publicClient.readContract({ address: CONFIG.wif, abi: erc20Abi, functionName: "decimals" }),
         publicClient.readContract({ address: CONFIG.wif, abi: erc20Abi, functionName: "symbol" }),

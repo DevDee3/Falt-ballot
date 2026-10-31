@@ -11,6 +11,17 @@ import { fmtToken } from "@/lib/format";
 
 interface Opt { label: string; beneficiary: string }
 
+function parseTokenAmount(value: string, decimals: number): bigint | null {
+  const text = value.trim();
+  // Keep the form predictable: decimal notation only, no commas or signs.
+  if (!/^\d+(\.\d+)?$/.test(text)) return null;
+  try {
+    return parseUnits(text, decimals);
+  } catch {
+    return null;
+  }
+}
+
 const DURATIONS = [
   { label: "30 minutes", s: 30 * 60 },
   { label: "6 hours", s: 6 * 3600 },
@@ -47,13 +58,9 @@ export default function Create() {
 
   const parsed = useMemo(() => {
     if (!token) return null;
-    try {
-      const cost = parseUnits(voteCost || "0", token.decimals);
-      const pr = parseUnits(prize || "0", token.decimals);
-      return { cost, pr };
-    } catch {
-      return null;
-    }
+    const cost = parseTokenAmount(voteCost || "0", token.decimals);
+    const pr = parseTokenAmount(prize || "0", token.decimals);
+    return cost === null || pr === null ? null : { cost, pr };
   }, [token, voteCost, prize]);
 
   const problems: string[] = [];
@@ -63,7 +70,7 @@ export default function Create() {
   if (opts.some((o) => !o.label.trim())) problems.push("Every option needs a name.");
   if (opts.some((o) => o.label.length > 64)) problems.push("Option names can be 64 characters at most.");
   if (opts.some((o) => o.beneficiary.trim() && !isAddress(o.beneficiary.trim()))) problems.push("A bounty address is not a valid address.");
-  if (!parsed) problems.push("Enter valid numbers for the vote cost and prize.");
+  if (token && !parsed) problems.push("Enter valid numbers for the vote cost and prize (for example, 1 or 0.5).");
   if (parsed && token && parsed.cost < 10n ** BigInt(token.decimals)) problems.push("The vote cost must be at least 1 $WIF.");
   if (!(Number(minVotes) >= 1)) problems.push("Minimum votes must be at least 1.");
   if (!(Number(slots) >= 1 && Number(slots) <= 100)) problems.push("Prize draws must be between 1 and 100.");
@@ -83,7 +90,7 @@ export default function Create() {
       const [balance, allowance, block] = await Promise.all([
         publicClient.readContract({ address: CONFIG.wif, abi: erc20Abi, functionName: "balanceOf", args: [from] }),
         publicClient.readContract({ address: CONFIG.wif, abi: erc20Abi, functionName: "allowance", args: [from, CONFIG.ballot as Address] }),
-        publicClient.getBlock(),
+        publicClient.getBlock({ blockTag: "latest" }),
       ]);
       if (balance < needed) throw new Error(`You need ${fmtToken(needed, token.decimals)} $${token.symbol} (bond plus prize pool) and hold ${fmtToken(balance, token.decimals)}.`);
 

@@ -403,8 +403,10 @@ export default function ElectionPage() {
   const [token, setToken] = useState<TokenInfo | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [computed, setComputed] = useState<Computed | null>(null);
-  const [clock, setClock] = useState(() => Math.floor(Date.now() / 1000));
-  const [fetchedAt, setFetchedAt] = useState(() => Math.floor(Date.now() / 1000));
+  // Keep the first server render and browser hydration identical. The clock is
+  // populated by the polling effect after hydration.
+  const [clock, setClock] = useState(0);
+  const [fetchedAt, setFetchedAt] = useState(0);
 
   const id = useMemo(() => {
     try {

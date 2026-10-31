@@ -12,7 +12,13 @@ export const chain = defineChain({
   blockExplorers: { default: { name: "Explorer", url: CONFIG.explorer } },
 });
 
-export const publicClient = createPublicClient({ chain, transport: http(CONFIG.rpcUrl), batch: { multicall: false } });
+// Robinhood testnet RPC responses can occasionally be slow. Keep requests
+// alive long enough for normal congestion and retry transient failures.
+export const publicClient = createPublicClient({
+  chain,
+  transport: http(CONFIG.rpcUrl, { timeout: 45_000, retryCount: 2, retryDelay: 1_000 }),
+  batch: { multicall: false },
+});
 
 export const erc20Abi = [
   { type: "function", name: "decimals", stateMutability: "view", inputs: [], outputs: [{ type: "uint8" }] },

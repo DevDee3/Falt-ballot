@@ -11,7 +11,13 @@ export function fmtToken(v: bigint, decimals: number, maxFrac = 2): string {
 }
 
 export function fmtDate(unix: number): string {
-  return new Date(unix * 1000).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" });
+  // Use the same locale/timezone during SSR and in the browser. Without this,
+  // server UTC and the user's local timezone can produce different HTML.
+  return new Intl.DateTimeFormat("en-US", {
+    dateStyle: "medium",
+    timeStyle: "short",
+    timeZone: "UTC",
+  }).format(new Date(unix * 1000));
 }
 
 export function fmtDuration(seconds: number): string {

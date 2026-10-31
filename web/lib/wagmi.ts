@@ -42,6 +42,9 @@ export const appKit = createAppKit({
   projectId,
   networks: [appNetwork],
   defaultNetwork: appNetwork,
+  // Keep local wallet configuration self-contained; do not fetch project
+  // settings from api.web3modal.org during startup/builds.
+  manualWCControl: true,
   metadata: {
     name: "Flat Ballot",
     description: "Public $WIF elections on Robinhood Chain",
