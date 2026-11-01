@@ -7,7 +7,7 @@ import { ConnectButton } from "@/components/ConnectButton";
 import { CONFIG } from "@/lib/config";
 
 export const metadata: Metadata = {
-  title: "Flat Ballot: public $WIF elections on Robinhood Chain",
+  title: "Flat Ballot",
   description: "Launch a $WIF election in one transaction. Vote by sending $WIF to an address. Every vote burns, and every result can be recomputed from the chain.",
 };
 
